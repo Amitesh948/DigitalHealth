@@ -1,0 +1,55 @@
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .logo-and-title {
+    display: flex;
+    align-items: center; /* Vertically align the logo and title section */
+    gap: 15px; /* Space between logo and title */
+  }
+  
+  .logo-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    height: 50px; /* Adjust logo size */
+  }
+  
+  .title-section {
+    display: flex;
+    align-items: center; /* Vertically align title and data details */
+    gap: 10px; /* Space between title and data details */
+  }
+  
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2a7cf6;
+  }
+  
+  .data-details {
+    font-size: 14px;
+    color: #2a7cf6;
+  }
+  
+  .guide-section {
+    text-align: right;
+  }
+  
+  .guide-link {
+    font-size: 14px;
+    color: #2a7cf6;
+    text-decoration: none;
+  }
+  
+  .guide-link:hover {
+    text-decoration: underline;
+  }
+  

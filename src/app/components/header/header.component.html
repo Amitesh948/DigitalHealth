@@ -1,0 +1,18 @@
+<div class="header">
+
+    <div class="logo-title">
+        <img src="assets/logo.png" alt="Logo" class="logo" />
+        <h1>The National Digital Health Strategy Map <a class="text">Data Details</a></h1>
+    </div>
+   
+</div>
+<div class="toggle-buttons">
+    <button [class.active]="currentBtn === 'health-it'" (click)="onToggle('health-it')" routerLink="'/health-it'"
+        routerLinkActive="active">
+        Health & IT
+    </button>
+    <button [class.active]="currentBtn === 'digital-health'" (click)="onToggle('digital-health')"
+        routerLink="'/digital-health'" routerLinkActive="active">
+        Digital Health
+    </button>
+</div>

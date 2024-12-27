@@ -93,9 +93,9 @@ export class MainComponent {
           }
         },
         data: [
-          { value: 90, name: 'Availability', itemStyle: { color: '#00c49f' } },
-          { value: 5, name: 'Readiness', itemStyle: { color: '#0088ff' } },
-          { value: 5, name: 'Remaining', itemStyle: { color: '#e0e0e0' } }
+          { value: 50, name: 'Availability', itemStyle: { color: '#0648bf' } },
+          { value: 50, name: 'Readiness', itemStyle: { color: '#2f4770' } },
+          { value: 50, name: 'Remaining', itemStyle: { color: '#e0e0e0' } }
         ]
       }
     ]

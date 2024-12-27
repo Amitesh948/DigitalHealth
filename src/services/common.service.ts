@@ -6,11 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CommonService {
-  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats/1/14/2021'; // Example API
+  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats';
 
   constructor(private http: HttpClient) { }
 
-  getData(): Observable<any> {
-    return this.http.get<any>(this.apiUrl);
+  getData(endpoint: any): Observable<any> {
+    const url = `${this.apiUrl}/${endpoint}`; 
+    return this.http.get<any>(url);
   }
 }

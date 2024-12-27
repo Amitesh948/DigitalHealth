@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { NgxEchartsModule } from 'ngx-echarts';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +7,10 @@ import { NgxEchartsModule } from 'ngx-echarts';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  
+  selectedToggle: string = '';
+  onToggleChange(event: string) {
+    this.selectedToggle = event;
+    console.log("appcompoennt", this.selectedToggle);
+
+  }
 }

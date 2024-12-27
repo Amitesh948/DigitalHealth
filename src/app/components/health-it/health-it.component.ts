@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
@@ -7,70 +7,104 @@ import { CommonService } from '../../../services/common.service';
   templateUrl: './health-it.component.html',
   styleUrls: ['./health-it.component.css']
 })
-export class HealthItComponent {
-  constructor(private common:CommonService){}
-  post: any[] = [];
+export class HealthItComponent implements OnChanges {
+  @Input() isToggleSelected: string = 'health-it';
+  keys: any;
+  post: any = {};
+  prospectiveDevelopmentData: any[] = [];
+  catagoryKey: any[] = [];
   averages: number[] = [];
+  halfOfDevelopment: { score: number; name: string }[] = [];
+  halfofBuilding: { score: number; name: string }[] = [];
+
   chartOptions: any[] = [];
 
+  constructor(private common: CommonService) { }
 
-  ngOnInit() {
-    this.common.getData('1/14/2021').subscribe(data => {
-      this.post = data;
-      console.log("Data received:", this.post);
-      this.calculateAverages(this.post);
-      console.log("Calculated Averages:", this.averages);
-      this.generateChartOptions();
-    });
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isToggleSelected']) {
+      this.resetData();
+      const toggleSelectedValue = this.isToggleSelected || 'health-it';
+      const endPoint = toggleSelectedValue === 'health-it' ? '1/14/2021' : '2/14/2021';
+      console.log("Amitesh", this.isToggleSelected);
+      this.common.getData(endPoint).subscribe(data => {
+        this.post = data;
+        this.keys = Object.keys(this.post);
+        this.prospectiveDevelopment();
+      });
+    }
   }
 
-  calculateAverages(data: any): void {
-    const categories = [
-      "AI Workforce/Infrastructure",
-      "Healthcare Governance",
-      "Healthcare workforce and Infrastructure",
-      "IT Governance",
-      "IT Workforce & Infrastructure",
-    ];
+  ngOnInit() {
 
-    const prospectiveData = data["Prospective Development"];
-    categories.forEach(category => {
-      let sum = 0;
-      if (prospectiveData[category]) {
-        sum = prospectiveData[category].reduce((acc: number, item: { score: string; }) => acc + parseInt(item.score, 10), 0);
+  }
+
+  resetData(): void {
+    this.chartOptions = [];
+    this.averages = [];
+    this.halfOfDevelopment = [];
+    this.halfofBuilding = [];
+    this.prospectiveDevelopmentData = [];
+  }
+
+  prospectiveDevelopment() {
+    for (const key of this.keys) {
+      if (key === 'Prospective Development') {
+        const unsortedCategoryKeys = Object.keys(this.post[key]);
+
+        const sortedCategoryKeys = unsortedCategoryKeys.sort((a, b) => a.localeCompare(b));
+        this.catagoryKey = sortedCategoryKeys;
+        this.prospectiveDevelopmentData = sortedCategoryKeys.map((sortedKey) => this.post[key][sortedKey]);
+        this.calculateAverage();
       }
-      const average = sum / 2;
+    }
+  }
+
+  calculateAverage(): void {
+    this.prospectiveDevelopmentData.forEach((category: any) => {
+      let totalScore = 0;
+
+      if (category && Array.isArray(category)) {
+        category.forEach((item: { score: string; ultimate_name: string }, index: number) => {
+          const score = parseInt(item.score, 10);
+
+          const halfScore = Math.round(score / 2);
+          if (index == 0) {
+            this.halfOfDevelopment.push({ score: halfScore, name: item.ultimate_name });
+          } else if (index === 1) {
+            this.halfofBuilding.push({ score: halfScore, name: item.ultimate_name });
+          }
+
+          totalScore += score;
+        });
+      }
+      const average = totalScore / 2;
       this.averages.push(Math.round(average));
     });
+
+
+    this.generateChartOptions();
   }
 
   generateChartOptions(): void {
+
+    this.chartOptions = [];
+
+
     this.averages.forEach((average, index) => {
-      const colors = this.getChartColors(index);
-      this.chartOptions.push(this.createPieChart(average, colors));
+      const buildingData = this.halfofBuilding[index] || { score: 0, name: 'N/A' };
+      const developmentData = this.halfOfDevelopment[index] || { score: 0, name: 'N/A' };
+      this.chartOptions.push(this.createPieChart(average, buildingData, developmentData));
     });
   }
 
-  getChartColors(index: number): string[] {
-    const colorSets = [
-      ['#2f4770', '#0648bf'], // Chart 1
-      ['#2f4770', '#0648bf'], // Chart 1
-      ['#2f4770', '#0648bf'], // Chart 2
-      ['#2f4770', '#0648bf'], // Chart 3
-      ['#2f4770', '#0648bf'], // Chart 4
-      ['#2f4770', '#0648bf'], // Chart 5
-    ];
-    return colorSets[index] || ['#CCCCCC', '#999999']; // Default colors if index exceeds predefined sets
-  }
-
-  createPieChart(score: number, colors: string[]): any {
-    const halfScore = score / 2; // Half the score for each colored section
-    const remaining = 100 - score; // Remaining portion (gray)
+  createPieChart(score: number, buildingData: any, developmentData: any): any {
+    const remaining = 100 - score;
 
     return {
       tooltip: {
         trigger: 'item',
-        formatter: '{b}: {c}%' // Tooltip to show category and percentage
+        formatter: '{b}: {c}%'
       },
       series: [
         {
@@ -79,18 +113,18 @@ export class HealthItComponent {
           label: {
             show: true,
             position: 'center',
-            formatter: `${score}%`, // Show the total score in the center
+            formatter: `${score}%`,
             fontSize: 30,
             fontWeight: 'bold',
             color: '#333',
           },
           data: [
-            { value: halfScore, name: 'Capicity building', itemStyle: { color: colors[0] } },
-            { value: halfScore, name: 'Development strategy', itemStyle: { color: colors[1] } },
+            { value: buildingData.score, name: buildingData.name, itemStyle: { color: '#2f4770' } },
+            { value: developmentData.score, name: developmentData.name, itemStyle: { color: '#0648bf' } },
             { value: remaining, name: '', itemStyle: { color: '#e0e0e0' } }
           ]
         }
       ]
     };
-  }  
+  }
 }

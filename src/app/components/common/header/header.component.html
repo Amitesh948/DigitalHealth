@@ -1,33 +1,29 @@
 <div>
-    <div class="logo-and-title">
-      <div class="logo-section">
-        <img src="assets/logo.png" alt="Global Research and I-DAIR Logos" class="logo">
-      </div>
-      <div class="title-section">
-        <span class="title">The National Digital Health Strategy Map</span>
-        <span class="data-details">Data Details</span>
-      </div>
-      <div class="guide-section">
-        <a href="#" class="guide-link">NDHS Map GUIDE</a>
-      </div>
+  <div class="logo-and-title">
+    <div class="logo-section">
+      <img src="assets/logo.png" alt="Global Research and I-DAIR Logos" class="logo">
     </div>
-    
+    <div class="title-section">
+      <span class="title">The National Digital Health Strategy Map</span>
+      <span class="data-details">Data Details</span>
+    </div>
+    <div class="guide-section">
+      <a href="#" class="guide-link">NDHS Map GUIDE</a>
+    </div>
+  </div>
 
-<div class="toggle-container">
-  <mat-button-toggle-group
-    appearance="legacy"
-    [(ngModel)]="selectedOption"
-    class="toggle-button-group"
-  >
-    <mat-button-toggle value="health-it" class="toggle-button" routerLink="/health&it">
-      Health & IT
-    </mat-button-toggle>
-    <mat-button-toggle value="digital-health" class="toggle-button" routerLink="/digitalhealth">
-      Digital Health
-    </mat-button-toggle>
-  </mat-button-toggle-group>
-</div>
-</div>
 
- 
-  
+  <div class="toggle-container">
+    <mat-button-toggle-group appearance="legacy" [(ngModel)]="selectedOption" (ngModelChange)="onToggleChange($event)"
+      class="toggle-button-group">
+      <mat-button-toggle value="health-it" class="toggle-button">
+        Health & IT
+      </mat-button-toggle>
+      <mat-button-toggle value="digital-health" class="toggle-button">
+        Digital Health
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+
+</div>

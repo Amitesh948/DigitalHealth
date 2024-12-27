@@ -7,7 +7,13 @@ import { HeaderComponent } from './components/common/header/header.component';
 import { LayoutComponent } from './components/common/layout/layout.component';
 import { MainComponent } from './components/main/main.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
+import { HealthItComponent } from './components/health-it/health-it.component';
+import { DigitalHealthComponent } from './components/digital-health/digital-health.component';
+
 
 @NgModule({
   declarations: [
@@ -15,6 +21,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
     HeaderComponent,
     LayoutComponent,
     MainComponent,
+    HealthItComponent,
+    DigitalHealthComponent,
     
   ],
   imports: [
@@ -25,6 +33,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
       echarts: () => import('echarts')
     }),
     NgbModule,
+    BrowserAnimationsModule,
+    MatButtonToggleModule,
+    FormsModule
 ],
   providers: [],
   bootstrap: [AppComponent]

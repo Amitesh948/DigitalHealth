@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonService } from '../../../../services/common.service';
 
 @Component({
   selector: 'app-header',
@@ -9,10 +10,10 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class HeaderComponent {
   selectedOption = 'health-it';
-  @Output() toggleCahnge = new EventEmitter<string>();
+  
+  constructor(private common:CommonService){}
 
   onToggleChange(newValue: string): void {
-    console.log(`Toggle changed to: ${newValue}`);
-    this.toggleCahnge.emit(newValue);
+    this.common.behaviourSubject.next(newValue);
   }
 }

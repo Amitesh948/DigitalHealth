@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
@@ -7,94 +7,84 @@ import { CommonService } from '../../../services/common.service';
   templateUrl: './health-it.component.html',
   styleUrls: ['./health-it.component.css']
 })
-export class HealthItComponent implements OnChanges {
-  @Input() isToggleSelected: string = 'health-it';
+export class HealthItComponent {
+
   keys: any;
   post: any = {};
   prospectiveDevelopmentData: any[] = [];
   catagoryKey: any[] = [];
-  averages: number[] = [];
-  halfOfDevelopment: { score: number; name: string }[] = [];
-  halfofBuilding: { score: number; name: string }[] = [];
-
+  allData: { average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
   chartOptions: any[] = [];
 
   constructor(private common: CommonService) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['isToggleSelected']) {
+  ngOnInit() {
+    this.common.behaviourSubject.subscribe((value) => {
       this.resetData();
-      const toggleSelectedValue = this.isToggleSelected || 'health-it';
-      const endPoint = toggleSelectedValue === 'health-it' ? '1/14/2021' : '2/14/2021';
-      console.log("Amitesh", this.isToggleSelected);
+      const endPoint = value === 'health-it' ? '1/14/2021' : '2/14/2021';
       this.common.getData(endPoint).subscribe(data => {
         this.post = data;
+        console.log("data", this.post);
+
         this.keys = Object.keys(this.post);
         this.prospectiveDevelopment();
       });
-    }
-  }
-
-  ngOnInit() {
-
+    });
   }
 
   resetData(): void {
     this.chartOptions = [];
-    this.averages = [];
-    this.halfOfDevelopment = [];
-    this.halfofBuilding = [];
+    this.allData = [];
     this.prospectiveDevelopmentData = [];
   }
 
   prospectiveDevelopment() {
-    for (const key of this.keys) {
-      if (key === 'Prospective Development') {
-        const unsortedCategoryKeys = Object.keys(this.post[key]);
+    const data1: any[] = Object.values(this.post);
 
-        const sortedCategoryKeys = unsortedCategoryKeys.sort((a, b) => a.localeCompare(b));
-        this.catagoryKey = sortedCategoryKeys;
-        this.prospectiveDevelopmentData = sortedCategoryKeys.map((sortedKey) => this.post[key][sortedKey]);
-        this.calculateAverage();
-      }
-    }
+    const data2 = data1[0];
+    const unsortedCategoryKeys = Object.keys(data2);
+    const sortedCategoryKeys = unsortedCategoryKeys.sort((a, b) => a.localeCompare(b));
+
+    this.prospectiveDevelopmentData = sortedCategoryKeys.map((sortedKey) => data2[sortedKey]);
+    this.calculateData();
+
   }
 
-  calculateAverage(): void {
+  calculateData(): void {
     this.prospectiveDevelopmentData.forEach((category: any) => {
       let totalScore = 0;
+      const building = { score1: 0, name1: 'N/A' };
+      const development = { score2: 0, name2: 'N/A' };
 
-      if (category && Array.isArray(category)) {
-        category.forEach((item: { score: string; ultimate_name: string }, index: number) => {
+      if (category) {
+        category.forEach((item: any, index: number) => {
           const score = parseInt(item.score, 10);
 
-          const halfScore = Math.round(score / 2);
-          if (index == 0) {
-            this.halfOfDevelopment.push({ score: halfScore, name: item.ultimate_name });
+          if (index === 0) {
+            const halfScore1 = Math.round(score / 2);
+            development.score2 = halfScore1;
+            development.name2 = item.ultimate_name;
           } else if (index === 1) {
-            this.halfofBuilding.push({ score: halfScore, name: item.ultimate_name });
+            const halfScore2 = Math.round(score / 2);
+            building.score1 = halfScore2;
+            building.name1 = item.ultimate_name;
           }
 
           totalScore += score;
         });
       }
-      const average = totalScore / 2;
-      this.averages.push(Math.round(average));
-    });
 
+      const average = Math.round(totalScore / 2);
+      this.allData.push({ average, building, development });
+    });
 
     this.generateChartOptions();
   }
 
   generateChartOptions(): void {
-
-    this.chartOptions = [];
-
-
-    this.averages.forEach((average, index) => {
-      const buildingData = this.halfofBuilding[index] || { score: 0, name: 'N/A' };
-      const developmentData = this.halfOfDevelopment[index] || { score: 0, name: 'N/A' };
-      this.chartOptions.push(this.createPieChart(average, buildingData, developmentData));
+    this.allData.forEach((data) => {
+      const { average, building, development } = data;
+      this.chartOptions.push(this.createPieChart(average, building, development));
     });
   }
 
@@ -104,7 +94,9 @@ export class HealthItComponent implements OnChanges {
     return {
       tooltip: {
         trigger: 'item',
-        formatter: '{b}: {c}%'
+        formatter: function (params: any) {
+          return params.name !== '' ? `${params.data.name} : ${params.data.value}%` : '';
+        },
       },
       series: [
         {
@@ -119,8 +111,8 @@ export class HealthItComponent implements OnChanges {
             color: '#333',
           },
           data: [
-            { value: buildingData.score, name: buildingData.name, itemStyle: { color: '#2f4770' } },
-            { value: developmentData.score, name: developmentData.name, itemStyle: { color: '#0648bf' } },
+            { value: buildingData.score1, name: buildingData.name1, itemStyle: { color: '#2f4770' } },
+            { value: developmentData.score2, name: developmentData.name2, itemStyle: { color: '#0648bf' } },
             { value: remaining, name: '', itemStyle: { color: '#e0e0e0' } }
           ]
         }

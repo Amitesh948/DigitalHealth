@@ -1,5 +1,10 @@
   .chart-container {
     height: 300px;
   }
-  
+  .panel[_ngcontent-kwt-c74] {
+    padding: 25px 15px;
+    box-shadow: 0 0 9px 1px #cccccc7f;
+    margin-bottom: 30px;
+    border-radius: 26px;
+  }
   

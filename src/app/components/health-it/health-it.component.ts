@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
+import { color } from 'echarts';
 
 @Component({
   selector: 'app-health-it',
@@ -10,11 +11,10 @@ import { CommonService } from '../../../services/common.service';
 export class HealthItComponent {
 
   keys: any;
-  post: any = {};
-  prospectiveDevelopmentData: any[] = [];
   catagoryKey: any[] = [];
-  allData: { average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
-  chartOptions: any[] = [];
+  allData: { key: string; average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
+  chartOptions1: any[] = [];
+  chartOptions2: any[] = [];
 
   constructor(private common: CommonService) { }
 
@@ -23,38 +23,35 @@ export class HealthItComponent {
       this.resetData();
       const endPoint = value === 'health-it' ? '1/14/2021' : '2/14/2021';
       this.common.getData(endPoint).subscribe(data => {
-        this.post = data;
-        console.log("data", this.post);
-
-        this.keys = Object.keys(this.post);
-        this.prospectiveDevelopment();
+        this.keys = Object.keys(data);
+        this.prospectiveDevelopment(data);
       });
     });
   }
 
   resetData(): void {
-    this.chartOptions = [];
+    this.chartOptions1 = [];
+    this.chartOptions2 = [];
     this.allData = [];
-    this.prospectiveDevelopmentData = [];
   }
 
-  prospectiveDevelopment() {
-    const data1: any[] = Object.values(this.post);
+  prospectiveDevelopment(value: string) {
+    for (let key of this.keys) {
+      this.chartOptions1 = [];
 
-    const data2 = data1[0];
-    const unsortedCategoryKeys = Object.keys(data2);
-    const sortedCategoryKeys = unsortedCategoryKeys.sort((a, b) => a.localeCompare(b));
-
-    this.prospectiveDevelopmentData = sortedCategoryKeys.map((sortedKey) => data2[sortedKey]);
-    this.calculateData();
-
+      const unsortedCategoryKeys = Object.keys(value[key]);
+      const sortedCategoryKeys = unsortedCategoryKeys.sort((a, b) => a.localeCompare(b));
+      this.catagoryKey = sortedCategoryKeys;
+      const data: any[] = sortedCategoryKeys.map((sortedKey: any) => value[key][sortedKey]);
+      this.calculateData(data, key);
+    }
   }
 
-  calculateData(): void {
-    this.prospectiveDevelopmentData.forEach((category: any) => {
+  calculateData(data: any[], key: any): void {
+    data.forEach((category: any) => {
       let totalScore = 0;
-      const building = { score1: 0, name1: 'N/A' };
-      const development = { score2: 0, name2: 'N/A' };
+      const building = { score1: 0, name1: '' };
+      const development = { score2: 0, name2: '' };
 
       if (category) {
         category.forEach((item: any, index: number) => {
@@ -75,20 +72,36 @@ export class HealthItComponent {
       }
 
       const average = Math.round(totalScore / 2);
-      this.allData.push({ average, building, development });
+      this.allData.push({ key, average, building, development });
+      console.log("0000", this.allData);
     });
 
     this.generateChartOptions();
   }
 
   generateChartOptions(): void {
+    console.log("gene", this.allData);
     this.allData.forEach((data) => {
-      const { average, building, development } = data;
-      this.chartOptions.push(this.createPieChart(average, building, development));
+      const colors = {
+        building: ' #2f4770',
+        development: '#0648bf', 
+        remaining: '#e0e0e0'   
+      };
+      const { key, average, building, development } = data;
+      if (key === 'Present Development')
+        {
+          colors.building='#176d3b';
+          colors.development='#558288'
+          this.chartOptions1.push(this.createPieChart(average, building, development,colors));
+        }
+      else
+       {
+        this.chartOptions2.push(this.createPieChart(average, building, development,colors));
+       }
     });
   }
 
-  createPieChart(score: number, buildingData: any, developmentData: any): any {
+  createPieChart(score: number, buildingData: any, developmentData: any, colors: { building: string; development: string; remaining: string; }): any {
     const remaining = 100 - score;
 
     return {
@@ -111,9 +124,9 @@ export class HealthItComponent {
             color: '#333',
           },
           data: [
-            { value: buildingData.score1, name: buildingData.name1, itemStyle: { color: '#2f4770' } },
-            { value: developmentData.score2, name: developmentData.name2, itemStyle: { color: '#0648bf' } },
-            { value: remaining, name: '', itemStyle: { color: '#e0e0e0' } }
+            { value: buildingData.score1, name: buildingData.name1, itemStyle: { color: colors.building } },
+            { value: developmentData.score2, name: developmentData.name2, itemStyle: { color: colors.development } },
+            { value: remaining, name: '', itemStyle: { color: colors.remaining } }
           ]
         }
       ]

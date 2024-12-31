@@ -6,5 +6,16 @@
     box-shadow: 0 0 9px 1px #cccccc7f;
     margin-bottom: 30px;
     border-radius: 26px;
+    margin-left: 300px;
+    margin-top: 30px;
+    margin-right: 30px;
+  }
+  .title-row {
+    margin-top: -20px;
+  }
+  .panel[_ngcontent-tbh-c74] {
+    margin-bottom: 0;
+    color: #0000003b;
+    font-weight: 700;
   }
   

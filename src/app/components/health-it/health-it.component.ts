@@ -9,7 +9,7 @@ import { color } from 'echarts';
   styleUrls: ['./health-it.component.css']
 })
 export class HealthItComponent {
-
+  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats';
   keys: any;
   catagoryKey: any[] = [];
   allData: { key: string; average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
@@ -22,7 +22,7 @@ export class HealthItComponent {
     this.common.behaviourSubject.subscribe((value) => {
       this.resetData();
       const endPoint = value === 'health-it' ? '1/14/2021' : '2/14/2021';
-      this.common.getData(endPoint).subscribe(data => {
+      this.common.getData(this.apiUrl,endPoint).subscribe(data => {
         this.keys = Object.keys(data);
         this.prospectiveDevelopment(data);
       });

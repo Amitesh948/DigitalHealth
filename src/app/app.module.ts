@@ -12,6 +12,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { HealthItComponent } from './components/health-it/health-it.component';
+import { BarchartComponent } from './components/barchart/barchart.component';
+
 
 
 
@@ -21,19 +23,20 @@ import { HealthItComponent } from './components/health-it/health-it.component';
     HeaderComponent,
     LayoutComponent,
     HealthItComponent,
+    BarchartComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
+        echarts: () => import('echarts')
     }),
     NgbModule,
     BrowserAnimationsModule,
     MatButtonToggleModule,
-    FormsModule
-  ],
+    FormsModule,
+],
   providers: [],
   bootstrap: [AppComponent]
 })

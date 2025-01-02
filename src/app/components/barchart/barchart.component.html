@@ -1,0 +1,4 @@
+<div *ngFor="let chart of chartsData">
+  <h3>{{ chart.datasets[0].label }}</h3>
+  <canvas [id]="chart.id"></canvas>
+</div>

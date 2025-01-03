@@ -65,6 +65,6 @@ export class WorldmapComponent {
       ],
     };
 
-    myChart.setOption(option);
+    //myChart.setOption();
   }
 }

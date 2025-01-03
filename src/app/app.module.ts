@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/common/header/header.component';
 import { LayoutComponent } from './components/common/layout/layout.component';
-
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -13,7 +12,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { HealthItComponent } from './components/health-it/health-it.component';
 import { BarchartComponent } from './components/barchart/barchart.component';
-
+import { WorldmapComponent } from './components/worldmap/worldmap.component';
 
 
 
@@ -23,7 +22,8 @@ import { BarchartComponent } from './components/barchart/barchart.component';
     HeaderComponent,
     LayoutComponent,
     HealthItComponent,
-    BarchartComponent
+    BarchartComponent,
+    WorldmapComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +36,7 @@ import { BarchartComponent } from './components/barchart/barchart.component';
     BrowserAnimationsModule,
     MatButtonToggleModule,
     FormsModule,
+    
 ],
   providers: [],
   bootstrap: [AppComponent]

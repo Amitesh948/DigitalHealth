@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 import Chart from 'chart.js/auto';
 
@@ -9,85 +9,102 @@ import Chart from 'chart.js/auto';
   styleUrls: ['./barchart.component.css']
 })
 export class BarchartComponent {
+  @ViewChildren('chartContainer') chartContainers!: QueryList<ElementRef>;
+
   private apiUrl = 'http://103.127.29.85:4000/ndhs-master/comparative-bar-charts';
+
   requestData = {
     governance_id: '1',
     countries: '228,14',
   };
+  
+  categories = ['Present Development', 'Prospective Development'];
 
-  public chartsData: any[] = []; // Array to store chart configurations
-  public chartInstances: any[] = []; // Array to store chart instances
-
-  constructor(private common: CommonService) { }
+  constructor(private common: CommonService) {}
 
   ngOnInit(): void {
     this.common.postData(this.apiUrl, this.requestData).subscribe((data) => {
-      const keys = Object.keys(data);
-      const values = Object.values(data);
-      console.log("API data:", data);
-
-      // Process the data to generate chart configurations
-      this.extractData(keys, values);
+      
+      this.generateCharts(data);
     });
   }
 
-  extractData(keys: any[], values: any[]): void {
-    values.forEach((value: any, index: number) => {
-      const categoryKey = keys[index];
-      const categoryValues = Object.values(value);
+  generateCharts(data: any) {
+    
+    this.chartContainers.forEach(container => {
+      container.nativeElement.innerHTML = '';
+    });
 
-      // Prepare chart data
-      const labels = Object.keys(value);
-      const data = categoryValues;
-
-      this.chartsData.push({
-        id: `Chart${index + 1}`,
-        labels: labels,
-        datasets: [
-          {
-            label: categoryKey,
-            data: data,
-            backgroundColor: this.getRandomColors(data.length),
-          },
-        ],
+    this.categories.forEach((category, index) => {
+      const taxonomyKeys = Object.keys(data[category]);
+      console.log('1',taxonomyKeys);
+      
+      taxonomyKeys.forEach((key) => {
+        const chartData = this.prepareChartData(data, category, key);
+        this.createChart(this.chartContainers.toArray()[index].nativeElement, category, key, chartData.labels, chartData.datasets);
       });
     });
-
-    this.createCharts();
   }
 
-  createCharts(): void {
-    this.chartsData.forEach((chartData) => {
-      const canvasElement = document.getElementById(chartData.id) as HTMLCanvasElement;
-    console.log("111111");
+  prepareChartData(data: any, category: string, taxonomyKey: string) {
+    console.log('data',data);
     
-      if (canvasElement) {
-        const chart = new Chart(canvasElement, {
-          type: 'bar',
-          data: {
-            labels: chartData.labels,
-            datasets: chartData.datasets,
-          },
-          options: {
-            aspectRatio: 2.5,
-            plugins: {
-              legend: {
-                display: true,
-              },
-            },
-          },
-        });
+    const labels: string[] = ['Availability', 'Readiness'];
+    const datasets: { label: string; backgroundColor: string; data: number[] }[] = [
+      {
+        label: 'Dataset 1',
+        backgroundColor: '#ab8eb0',
+        data: [],
+      },
+      {
+        label: 'Dataset 2',
+        backgroundColor: ' #68c591',
+        data: [],
+      },
+    ];
 
-        this.chartInstances.push(chart);
+    const items = data[category][taxonomyKey];
+
+    items.forEach((item: any, index: number) => {
+      if (index % 2 === 0) {
+        datasets[0].data.push(+item.score);
+      } else {
+        datasets[1].data.push(+item.score);
       }
     });
+
+    return { labels, datasets };
   }
 
-  getRandomColors(count: number): string[] {
-    const colors = [];
-    for (let i = 0; i < count; i++) {
-      colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
-    }
-    return colors;
+  createChart(container: HTMLElement, _category: string, _taxonomyKey: string, labels: string[], datasets: any[]) {
+    const canvas = document.createElement('canvas');
+    container.appendChild(canvas);
+
+    new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: datasets,
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            stacked: false,
+            beginAtZero: true,
+          },
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },         
+    });
   }
 }
+
+

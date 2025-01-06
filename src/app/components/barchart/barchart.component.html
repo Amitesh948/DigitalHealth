@@ -1,10 +1,35 @@
-<div class="container">
-  <div class="row">
-    <div class="col-md-12 mt-5 card" *ngFor="let chart of charts; let groupIndex=index;">
-      <h1>{{chart[0]}}</h1>
-      <div class="card" *ngFor="let item of Object.entries(chart[1]); let chartIndex=index">
-        <p>{{item[0]}}</p>
-        <div [class]="getClass(groupIndex,chartIndex)"></div>
+<div class="panel">
+  <div class="container mt-5">
+    <div class="row mb-3">
+      <div class="col-12">
+        <h3>{{categories[0]}}</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-3 " *ngFor="let chart of charts1; let i = index">
+        <div class="card p-4">
+          <h6 class="text-center mb-3">{{ keysData[i] }}</h6>
+          <div echarts [options]="chart" class="chart-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="panel">
+  <div class="container mt-5">
+    <div class="row mb-3">
+      <div class="col-12">
+        <h3> 
+         {{categories[1]}}
+          </h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-3 mb-4" *ngFor="let chart of charts2; let i = index">
+        <div class="card p-4">
+          <h6 class="text-center mb-3">{{ keysData[i] }}</h6>
+          <div echarts [options]="chart" class="chart-container"></div>
+        </div>
       </div>
     </div>
   </div>

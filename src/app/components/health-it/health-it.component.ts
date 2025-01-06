@@ -99,6 +99,8 @@ export class HealthItComponent {
         this.chartOptions2.push(this.createPieChart(average, building, development,colors));
        }
     });
+    console.log('charts',this.chartOptions1);
+    console.log('charts',this.chartOptions2);
   }
 
   createPieChart(score: number, buildingData: any, developmentData: any, colors: { building: string; development: string; remaining: string; }): any {

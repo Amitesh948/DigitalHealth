@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
-import { color } from 'echarts';
 
 @Component({
   selector: 'app-health-it',
@@ -9,20 +8,63 @@ import { color } from 'echarts';
   styleUrls: ['./health-it.component.css']
 })
 export class HealthItComponent {
-  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats';
+  private piaChartApiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats';
+  private countryListApiUrl = 'http://103.127.29.85:4000/ndhs-master/country-list';
   keys: any;
   catagoryKey: any[] = [];
   allData: { key: string; average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
-  chartOptions1: any[] = [];
-  chartOptions2: any[] = [];
-
+  chartOptions1: any[] = []; 
+  chartOptions2: any[] = []; 
+ 
+  
   constructor(private common: CommonService) { }
+
+  isOpen = false;
+  searchText = '';
+
+  countries = [
+    { name: 'Austria', code: 'AT' },
+    { name: 'Germany', code: 'DE' },
+    { name: 'France', code: 'FR' },
+    { name: 'Italy', code: 'IT' },
+    { name: 'Spain', code: 'ES' },
+    { name: 'Austria', code: 'AT' },
+    { name: 'Germany', code: 'DE' },
+    { name: 'France', code: 'FR' },
+    { name: 'Italy', code: 'IT' },
+    { name: 'Spain', code: 'ES' },
+    { name: 'Austria', code: 'AT' },
+    { name: 'Germany', code: 'DE' },
+    { name: 'France', code: 'FR' },
+    { name: 'Italy', code: 'IT' },
+    { name: 'Spain', code: 'ES' },
+    { name: 'Austria', code: 'AT' },
+    { name: 'Germany', code: 'DE' },
+    { name: 'France', code: 'FR' },
+    { name: 'Italy', code: 'IT' },
+    { name: 'Spain', code: 'ES' },
+  ];
+
+  toggleSidebar() {
+    this.isOpen = !this.isOpen;
+  }
+
+  filteredCountries() {
+    return this.countries.filter((country) =>
+      country.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
+  }
 
   ngOnInit() {
     this.common.behaviourSubject.subscribe((value) => {
       this.resetData();
       const endPoint = value === 'health-it' ? '1/14/2021' : '2/14/2021';
-      this.common.getData(this.apiUrl,endPoint).subscribe(data => {
+      this.common.getData(this.countryListApiUrl,'').subscribe(countryData =>{
+        console.log('countryData',countryData);
+        
+      });
+      this.common.getData(this.piaChartApiUrl,endPoint).subscribe(data => {
+        console.log('data',data);
         this.keys = Object.keys(data);
         this.prospectiveDevelopment(data);
       });
@@ -73,14 +115,13 @@ export class HealthItComponent {
 
       const average = Math.round(totalScore / 2);
       this.allData.push({ key, average, building, development });
-      console.log("0000", this.allData);
+    
     });
 
     this.generateChartOptions();
   }
 
   generateChartOptions(): void {
-    console.log("gene", this.allData);
     this.allData.forEach((data) => {
       const colors = {
         building: ' #2f4770',
@@ -99,8 +140,7 @@ export class HealthItComponent {
         this.chartOptions2.push(this.createPieChart(average, building, development,colors));
        }
     });
-    console.log('charts',this.chartOptions1);
-    console.log('charts',this.chartOptions2);
+    
   }
 
   createPieChart(score: number, buildingData: any, developmentData: any, colors: { building: string; development: string; remaining: string; }): any {

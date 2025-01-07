@@ -1,70 +1,57 @@
-import { Component } from '@angular/core';
-import * as echarts from 'echarts';
-import { CommonService } from '../../../services/common.service';
+import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-worldmap',
   standalone: false,
   templateUrl: './worldmap.component.html',
-  styleUrl: './worldmap.component.css'
+  styleUrls: ['./worldmap.component.css']
 })
-export class WorldmapComponent {
-  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/country-list';
+export class WorldmapComponent implements AfterViewInit {
+  @ViewChild('mapCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>; // Ensure static is false
 
-  constructor(private common: CommonService) {
+  private ctx!: CanvasRenderingContext2D;
 
+  ngAfterViewInit(): void {
+    if (this.canvasRef) {
+      const canvas = this.canvasRef.nativeElement;
+      this.ctx = canvas.getContext('2d')!;
+      this.drawMap();
+    }
   }
-  ngOnInit() {
-    this.common.getData(this.apiUrl,'').subscribe((data)=>{
-       console.log('data',data);
-       
-    })
-    this.initMap();
+
+  private drawMap(): void {
+    const width = this.ctx.canvas.width;
+    const height = this.ctx.canvas.height;
+
+    this.ctx.fillStyle = '#e0e0e0';
+    this.ctx.fillRect(0, 0, width, height);
+
+    // Draw grid lines
+    const cellSize = 50;
+    this.ctx.strokeStyle = '#cccccc';
+    for (let x = 0; x <= width; x += cellSize) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, height);
+      this.ctx.stroke();
+    }
+    for (let y = 0; y <= height; y += cellSize) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(width, y);
+      this.ctx.stroke();
+    }
+
+    // Add a marker (example)
+    this.drawMarker(200, 200, 'red');
   }
 
-  initMap() {
-    const chartDom = document.getElementById('world-map')!;
-    const myChart = echarts.init(chartDom);
-
-    const option = {
-      tooltip: {
-        trigger: 'item',
-      },
-      visualMap: {
-        show: false,
-        min: 0,
-        max: 100,
-        inRange: {
-          color: ['#e0ffff', '#006edd'],
-        },
-      },
-      geo: {
-        map: 'world',
-        roam: true,
-        itemStyle: {
-          areaColor: '#f3f3f3',
-          borderColor: '#111',
-        },
-      },
-      series: [
-        {
-          name: '2021',
-          type: 'scatter',
-          coordinateSystem: 'geo',
-          symbolSize: 10,
-          itemStyle: {
-            color: '#4169E1',
-          },
-          data: [
-            { name: 'New York', value: [-74.006, 40.7128] },
-            { name: 'London', value: [-0.1276, 51.5074] },
-            { name: 'Tokyo', value: [139.6917, 35.6895] },
-            // Add more data points
-          ],
-        },
-      ],
-    };
-
-    //myChart.setOption();
+  private drawMarker(x: number, y: number, color: string): void {
+    this.ctx.fillStyle = color;
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 10, 0, 2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.strokeStyle = 'black';
+    this.ctx.stroke();
   }
 }

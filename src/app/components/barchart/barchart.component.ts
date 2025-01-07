@@ -50,7 +50,6 @@ export class BarchartComponent implements AfterViewInit {
 
       keys.forEach((key) => {
         const chartData = this.prepareChartData(data, category, key);
-        console.log(chartData.labels);
         const options = this.createChartOptions(chartData.labels, chartData.datasets);
         if(index==0)
         this.charts1.push(options); 
@@ -72,8 +71,7 @@ export class BarchartComponent implements AfterViewInit {
     items.forEach((item: any) => {
       countriesNameSet.add(item.countries_name);
       ultimateNameSet.add(item.ultimate_name);
-     
-      
+
     });
 
     const labels: string[] = Array.from(ultimateNameSet).sort();
@@ -95,11 +93,23 @@ export class BarchartComponent implements AfterViewInit {
   }
 
   createChartOptions(labels: string[], datasets: any[]) {
+    console.log('labels',labels);
+    
     return {
       tooltip: {},
       xAxis: {
         type: 'category',
         data: labels,
+        axisLabel: {
+          interval: 0, 
+          formatter: (value: string) => {
+            const index = value.indexOf(' ');
+            if (index !== -1) {
+              return value.slice(0, index) + '\n' + value.slice(index + 1);
+            }
+            return value; 
+          }, 
+        },
       },
       yAxis: {
         type: 'value',

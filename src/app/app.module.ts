@@ -13,6 +13,10 @@ import { FormsModule } from '@angular/forms';
 import { HealthItComponent } from './components/health-it/health-it.component';
 import { BarchartComponent } from './components/barchart/barchart.component';
 import { WorldmapComponent } from './components/worldmap/worldmap.component';
+import {ScrollingModule} from '@angular/cdk/scrolling'; 
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 
 
@@ -36,7 +40,10 @@ import { WorldmapComponent } from './components/worldmap/worldmap.component';
     BrowserAnimationsModule,
     MatButtonToggleModule,
     FormsModule,
-    
+    ScrollingModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatButtonModule,
 ],
   providers: [],
   bootstrap: [AppComponent]

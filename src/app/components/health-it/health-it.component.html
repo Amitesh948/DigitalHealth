@@ -2,7 +2,7 @@
   <div class="container mt-5">
     <div class="row mb-3">
       <div class="col-12">
-        <h3 _ngcontent-tbh-c74="">Present Development</h3>
+        <h6 _ngcontent-tbh-c74="">{{keys[0]}}</h6>
       </div>
     </div>
     <div class="row">
@@ -20,7 +20,7 @@
   <div class="container mt-5">
     <div class="row mb-3">
       <div class="col-12">
-        <h3 _ngcontent-tbh-c74="">Prospective Development</h3>
+        <h6 _ngcontent-tbh-c74="">{{keys[1]}}</h6>
       </div>
     </div>
     <div class="row">
@@ -33,3 +33,32 @@
     </div>
   </div>
   </div>
+
+  <div class="flex items-center bg-white rounded-full shadow-md p-2">
+  <i class="fas fa-chevron-left text-blue-500">
+  </i>
+ </div>
+ <div class="sidebar" [class.open]="isOpen">
+<button class="toggle-button" (click)="toggleSidebar()">
+  <span *ngIf="!isOpen">▶</span>
+  <span *ngIf="isOpen">◀</span>
+</button>
+
+<div class="sidebar-content" *ngIf="isOpen">
+  <input
+    type="text"
+    placeholder="Search countries..."
+    [(ngModel)]="searchText"
+    class="search-box"
+  />
+  <ul class="country-list">
+    <li *ngFor="let country of filteredCountries()">
+      <img
+        [src]="'https://flagcdn.com/w40/' + country.code.toLowerCase() + '.png'"
+        alt="{{ country.name }}"
+      />
+      {{ country.name }}
+    </li>
+  </ul>
+</div>
+</div>

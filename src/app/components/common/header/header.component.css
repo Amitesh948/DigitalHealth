@@ -28,7 +28,6 @@
 .title-section {
   display: flex;
   align-items: center;
-  /* Vertically align title and data details */
   gap: 10px;
   /* Space between title and data details */
 }
@@ -107,8 +106,9 @@
   /* Active text color */
 }
 
-/* Inactive toggle button */
+
 .toggle-button:not(.mat-button-toggle-checked) {
   background-color: white;
   color: #757575;
 }
+

@@ -91,7 +91,7 @@
   position: absolute;
   right: 20px; /* Place near toggle buttons */
   top: 80px; /* Below the header */
-  width: 50px; /* Default collapsed width */
+  width: 150px; /* Default collapsed width */
   height: 50px; /* Adjustable height */
   background-color: #f8f9fa;
   border: 1px solid #ddd;
@@ -102,16 +102,29 @@
 }
 
 .sidebar.open {
-  width: 150px; /* Expand width */
+  width: 180px; /* Expand width */
   height: 600px;
 }
 
 .toggle-button {
   position: absolute;
   top: 10px;
-  left: 0; /* Attach to the sidebar */
-  background-color: #007bff;
-  color: white;
+  left: 0; 
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+.country-set {
+  position: absolute;
+  top: 10px;
+  margin-left: 55px;
   border: none;
   border-radius: 50%;
   width: 30px;
@@ -129,17 +142,18 @@
 
 .search-box {
   width: 100%;
-  
+  margin-left: 20px;
+  margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .country-list {
-  margin-top: 10px;
-  list-style: none;
+  max-height: 500px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enables vertical scrolling */
   padding: 0;
-  overflow-y: auto;
-  height: calc(100% - 60px);
+  margin: 0;
+  list-style: none;
 }
 
 .country-list li {
@@ -149,9 +163,9 @@
 }
 
 .country-list img {
-  width: 30px;
-  height: 20px;
   margin-right: 10px;
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
 }
-
   

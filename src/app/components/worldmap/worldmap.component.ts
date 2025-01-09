@@ -42,7 +42,6 @@ export class WorldmapComponent implements AfterViewInit {
       this.ctx.stroke();
     }
 
-    // Add a marker (example)
     this.drawMarker(200, 200, 'red');
   }
 

@@ -4,7 +4,6 @@ import { CommonService } from '../../../../services/common.service';
 @Component({
   selector: 'app-header',
   standalone: false,
-
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })

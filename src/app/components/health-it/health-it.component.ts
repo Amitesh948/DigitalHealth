@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
+import { switchMap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-health-it',
@@ -8,68 +10,62 @@ import { CommonService } from '../../../services/common.service';
   styleUrls: ['./health-it.component.css']
 })
 export class HealthItComponent {
+
   private piaChartApiUrl = 'http://103.127.29.85:4000/ndhs-master/governance-stats';
   private countryListApiUrl = 'http://103.127.29.85:4000/ndhs-master/country-list';
   keys: any;
   catagoryKey: any[] = [];
   allData: { key: string; average: number; building: { score1: number; name1: string }; development: { score2: number; name2: string } }[] = [];
-  chartOptions1: any[] = []; 
-  chartOptions2: any[] = []; 
- 
-  
-  constructor(private common: CommonService) { }
-
-  isOpen = false;
+  chartOptions1: any[] = [];
+  chartOptions2: any[] = [];
+  countries: { cId: any; countryName: any; flag: any; year: any }[] = [];
+  private selectedIDSubject = new BehaviorSubject<{ selectedID: any, selectedYear: any }>({ selectedID: this.countries[0]?.cId, selectedYear: this.countries[0]?.year });
+  selectedIDYear = this.selectedIDSubject.asObservable();
+  closeSideBar: { flag: any; countryName: any } | undefined;
+  isInitial = false;
+  isOpen = signal<boolean>(false);
   searchText = '';
 
-  countries = [
-    { name: 'Austria', code: 'AT' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'France', code: 'FR' },
-    { name: 'Italy', code: 'IT' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'Austria', code: 'AT' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'France', code: 'FR' },
-    { name: 'Italy', code: 'IT' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'Austria', code: 'AT' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'France', code: 'FR' },
-    { name: 'Italy', code: 'IT' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'Austria', code: 'AT' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'France', code: 'FR' },
-    { name: 'Italy', code: 'IT' },
-    { name: 'Spain', code: 'ES' },
-  ];
+  constructor(private common: CommonService) { }
 
   toggleSidebar() {
-    this.isOpen = !this.isOpen;
-  }
-
-  filteredCountries() {
-    return this.countries.filter((country) =>
-      country.name.toLowerCase().includes(this.searchText.toLowerCase())
-    );
+   this.isOpen.set(!this.isOpen());
+   console.log('aa',this.isOpen());
+   
+    this.isInitial=true;
   }
 
   ngOnInit() {
     this.common.behaviourSubject.subscribe((value) => {
       this.resetData();
-      const endPoint = value === 'health-it' ? '1/14/2021' : '2/14/2021';
-      this.common.getData(this.countryListApiUrl,'').subscribe(countryData =>{
-        console.log('countryData',countryData);
-        
-      });
-      this.common.getData(this.piaChartApiUrl,endPoint).subscribe(data => {
-        console.log('data',data);
+      this.countries = [];
+
+      this.common.getData(this.countryListApiUrl, '').pipe(
+        switchMap((countryData) => {
+          this.getCountryList(countryData);
+          if (!(this.common.hasSelectedIdBeenSet)) {
+            this.common.setHasSelectedIdBeenSet(true);
+            const initialCountryId = this.countries[0]?.cId;
+            const initialCountryYear = this.countries[0]?.year;
+            const data = { selectedID: initialCountryId, selectedYear: initialCountryYear };
+            this.selectedIDSubject.next(data);
+          }
+          return this.selectedIDSubject.pipe(
+            switchMap((selectedIDYear) => {
+              const endPoint = value === 'health-it'
+                ? `1/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`
+                : `2/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`;
+              return this.common.getData(this.piaChartApiUrl, endPoint);
+            })
+          );
+        })
+      ).subscribe((data) => {
         this.keys = Object.keys(data);
         this.prospectiveDevelopment(data);
       });
     });
   }
+
 
   resetData(): void {
     this.chartOptions1 = [];
@@ -77,7 +73,23 @@ export class HealthItComponent {
     this.allData = [];
   }
 
+  getCountryList(countryData: any) {
+    countryData.forEach((data: any) => {
+      this.countries.push({ cId: data.id, countryName: data.name, flag: data.flag, year: data.year });
+    });
+  }
+
+  selectedcountry(countryData: any) {
+    console.log('id', countryData);
+    this.resetData();
+    const data = { selectedID: countryData.cId, selectedYear: countryData.year };
+    this.selectedIDSubject.next(data);
+    this.isOpen.set(!this.isOpen())
+    this.closeSideBar = { flag: countryData.flag, countryName: countryData.countryName }
+  }
+
   prospectiveDevelopment(value: string) {
+    this.resetData();
     for (let key of this.keys) {
       this.chartOptions1 = [];
 
@@ -115,32 +127,31 @@ export class HealthItComponent {
 
       const average = Math.round(totalScore / 2);
       this.allData.push({ key, average, building, development });
-    
+
     });
 
     this.generateChartOptions();
   }
 
   generateChartOptions(): void {
+
     this.allData.forEach((data) => {
       const colors = {
         building: ' #2f4770',
-        development: '#0648bf', 
-        remaining: '#e0e0e0'   
+        development: '#0648bf',
+        remaining: '#e0e0e0'
       };
       const { key, average, building, development } = data;
-      if (key === 'Present Development')
-        {
-          colors.building='#176d3b';
-          colors.development='#558288'
-          this.chartOptions1.push(this.createPieChart(average, building, development,colors));
-        }
-      else
-       {
-        this.chartOptions2.push(this.createPieChart(average, building, development,colors));
-       }
+      if (key === 'Present Development') {
+        colors.building = '#176d3b';
+        colors.development = '#558288'
+        this.chartOptions1.push(this.createPieChart(average, building, development, colors));
+      }
+      else {
+        this.chartOptions2.push(this.createPieChart(average, building, development, colors));
+      }
     });
-    
+
   }
 
   createPieChart(score: number, buildingData: any, developmentData: any, colors: { building: string; development: string; remaining: string; }): any {

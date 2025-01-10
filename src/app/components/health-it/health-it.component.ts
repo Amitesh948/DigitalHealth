@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 import { switchMap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
@@ -26,45 +26,51 @@ export class HealthItComponent {
   isOpen = signal<boolean>(false);
   searchText = '';
 
-  constructor(private common: CommonService) { }
+  constructor(private common: CommonService) { 
+    effect(() => {
+      this.fetchDataBasedOnSignal();
+    });
+  }
 
   toggleSidebar() {
    this.isOpen.set(!this.isOpen());
-   console.log('aa',this.isOpen());
-   
-    this.isInitial=true;
+    this.isInitial=!this.isInitial;
   }
 
   ngOnInit() {
-    this.common.behaviourSubject.subscribe((value) => {
-      this.resetData();
-      this.countries = [];
+    this.resetData();
+    this.countries = [];
 
-      this.common.getData(this.countryListApiUrl, '').pipe(
-        switchMap((countryData) => {
-          this.getCountryList(countryData);
-          if (!(this.common.hasSelectedIdBeenSet)) {
-            this.common.setHasSelectedIdBeenSet(true);
-            const initialCountryId = this.countries[0]?.cId;
-            const initialCountryYear = this.countries[0]?.year;
-            const data = { selectedID: initialCountryId, selectedYear: initialCountryYear };
-            this.selectedIDSubject.next(data);
-          }
-          return this.selectedIDSubject.pipe(
-            switchMap((selectedIDYear) => {
-              const endPoint = value === 'health-it'
-                ? `1/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`
-                : `2/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`;
-              return this.common.getData(this.piaChartApiUrl, endPoint);
-            })
-          );
-        })
-      ).subscribe((data) => {
-        this.keys = Object.keys(data);
-        this.prospectiveDevelopment(data);
-      });
+    this.common.getData(this.countryListApiUrl, '').subscribe((countryData) => {
+      this.getCountryList(countryData);
+
+      if (!this.common.hasSelectedIdBeenSet) {
+        this.common.setHasSelectedIdBeenSet(true);
+        const initialCountryId = this.countries[0]?.cId;
+        const initialCountryYear = this.countries[0]?.year;
+        const data = { selectedID: initialCountryId, selectedYear: initialCountryYear };
+        this.selectedIDSubject.next(data);
+        this.fetchDataBasedOnSignal();
+      }
+
     });
   }
+
+  fetchDataBasedOnSignal() {
+    const toggleValue = this.common.changeToggleButton();
+    const selectedIDYear = this.selectedIDSubject.value;
+  
+    const endPoint =
+      toggleValue === 'health-it'
+        ? `1/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`
+        : `2/${selectedIDYear.selectedID}/${selectedIDYear.selectedYear}`;
+  
+    this.common.getData(this.piaChartApiUrl, endPoint).subscribe((data) => {
+      this.keys = Object.keys(data);
+      this.prospectiveDevelopment(data);
+    });
+  }
+  
 
 
   resetData(): void {
@@ -80,10 +86,10 @@ export class HealthItComponent {
   }
 
   selectedcountry(countryData: any) {
-    console.log('id', countryData);
     this.resetData();
     const data = { selectedID: countryData.cId, selectedYear: countryData.year };
     this.selectedIDSubject.next(data);
+    this.fetchDataBasedOnSignal();
     this.isOpen.set(!this.isOpen())
     this.closeSideBar = { flag: countryData.flag, countryName: countryData.countryName }
   }

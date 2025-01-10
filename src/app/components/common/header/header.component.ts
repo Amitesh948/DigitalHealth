@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonService } from '../../../../services/common.service';
 
 @Component({
@@ -14,5 +14,7 @@ export class HeaderComponent {
 
   onToggleChange(newValue: string): void {
     this.common.behaviourSubject.next(newValue);
+    this.common.changeToggleButton.set(newValue);
+    
   }
 }

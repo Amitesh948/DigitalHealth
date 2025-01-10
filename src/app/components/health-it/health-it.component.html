@@ -57,10 +57,10 @@
    <div class="sidebar-close" *ngIf="!isOpen()">
     <ul class="country-set" *ngIf="!isInitial">
       <img
-      [src]="'https://flagcdn.com/w40/' +  countries?.[0]?.flag"
-          alt="{{ countries?.[0]?.countryName }}"
+      [src]="'https://flagcdn.com/w40/' +  countries[0].flag"
+          alt="{{ countries[0].countryName }}"
       />
-      {{ countries?.[0]?.countryName }}
+      {{ countries[0].countryName }}
     </ul>
    </div>
 

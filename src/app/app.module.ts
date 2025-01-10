@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
+import { NgModule   } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/common/header/header.component';
 import { LayoutComponent } from './components/common/layout/layout.component';
-import { NgxEchartsModule } from 'ngx-echarts';
+import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -17,6 +17,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { RadarchartComponent } from './components/radarchart/radarchart.component';
 
 
 
@@ -27,15 +28,14 @@ import { MatButtonModule } from '@angular/material/button';
     LayoutComponent,
     HealthItComponent,
     BarchartComponent,
-    WorldmapComponent
+    WorldmapComponent,
+    RadarchartComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    NgxEchartsModule.forRoot({
-        echarts: () => import('echarts')
-    }),
+    NgxEchartsModule,
     NgbModule,
     BrowserAnimationsModule,
     MatButtonToggleModule,
@@ -44,8 +44,16 @@ import { MatButtonModule } from '@angular/material/button';
     MatSidenavModule,
     MatIconModule,
     MatButtonModule,
+    NgxEchartsModule
 ],
-  providers: [],
+providers: [
+  {
+    provide: NGX_ECHARTS_CONFIG,
+    useValue: {
+      echarts: () => import('echarts') // Lazy load echarts
+    }
+  }
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

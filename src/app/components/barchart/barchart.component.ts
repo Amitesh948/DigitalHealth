@@ -1,4 +1,4 @@
-import { Component, ElementRef, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren, AfterViewInit, effect, signal } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 
 
@@ -11,12 +11,6 @@ import { CommonService } from '../../../services/common.service';
 export class BarchartComponent implements AfterViewInit {
   @ViewChildren('chartContainer') chartContainers!: QueryList<ElementRef>;
 
-  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/comparative-bar-charts';
-  requestData = {
-    governance_id: '1',
-    countries: '228,14',
-  };
-
   categories: string[] = [];
   charts1: any[] = [];  
   charts2: any[] = [];
@@ -24,16 +18,37 @@ export class BarchartComponent implements AfterViewInit {
   isDataLoaded: boolean = false;
   keysData: any[]=[];
 
-  constructor(private common: CommonService) {}
+  private apiUrl = 'http://103.127.29.85:4000/ndhs-master/comparative-bar-charts';
+  requestData = {
+    governance_id: '1',
+    countries: `228,14`,
+  };
+
+  constructor(private common: CommonService) { 
+    effect(() => {
+     this.fetchDataFromApi();   
+    });
+  }
 
   ngOnInit(): void {
-    this.common.postData(this.apiUrl, this.requestData).subscribe((data) => {
-      this.data = data;
-      console.log('apiData',data)
-      this.categories = Object.keys(data);
-      this.isDataLoaded = true;
-      this.generateCharts(data);
-    });
+   
+  }
+  fetchDataFromApi() {
+    const toggleChange =this.common.changeToggleButton();
+    if(toggleChange === 'health-it')
+      {
+       this.requestData.governance_id = '1';
+      }
+      else{
+      this.requestData.governance_id= '2'
+      }
+     
+      this.common.postData(this.apiUrl, this.requestData).subscribe((data) => {
+        this.data = data;
+        this.categories = Object.keys(data);
+        this.isDataLoaded = true;
+        this.generateCharts(data);
+      });
   }
 
   ngAfterViewInit(): void {
@@ -41,14 +56,18 @@ export class BarchartComponent implements AfterViewInit {
       this.generateCharts(this.data);
     }
   }
+  resetData() {
+   this.charts1=[];
+   this.charts2=[];
+  }
 
   generateCharts(data: any) {
+    this.resetData();
     this.categories.forEach((category, index) => {
-      const keys = Object.keys(data[category]);
-      this.keysData=keys;
-      keys.sort();
+     this.keysData= Object.keys(data[category]).sort();
+  
 
-      keys.forEach((key) => {
+      this.keysData.forEach((key) => {
         const chartData = this.prepareChartData(data, category, key);
         const options = this.createChartOptions(chartData.labels, chartData.datasets);
         if(index==0)
@@ -58,6 +77,7 @@ export class BarchartComponent implements AfterViewInit {
       });
     });
   }
+  
 
   prepareChartData(data: any, category: string, taxonomyKey: string) {
     const ultimateNameSet: Set<string> = new Set();
@@ -81,10 +101,10 @@ export class BarchartComponent implements AfterViewInit {
       const countryIndex = names.indexOf(item.countries_name);
       const labelIndex = labels.indexOf(item.ultimate_name);
      
-
       if (countryIndex === 0) {
         datasets[0].data[labelIndex] = item.score;
       } else if (countryIndex === 1) {
+        console.log('1211',item.score);  
         datasets[1].data[labelIndex] = item.score;
       }
     });
@@ -93,7 +113,6 @@ export class BarchartComponent implements AfterViewInit {
   }
 
   createChartOptions(labels: string[], datasets: any[]) {
-    console.log('labels',labels);
     
     return {
       tooltip: {},

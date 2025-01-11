@@ -13,7 +13,7 @@
   </div>
 
 
-  <div class="toggle-container">
+  <div class="toggle-container" [ngStyle]="{ 'margin-left.px': marginLeft }">
     <mat-button-toggle-group appearance="legacy" [(ngModel)]="selectedOption" (ngModelChange)="onToggleChange($event)"
       class="toggle-button-group">
       <mat-button-toggle value="health-it" class="toggle-button">

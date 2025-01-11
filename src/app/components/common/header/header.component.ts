@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonService } from '../../../../services/common.service';
 
 @Component({
@@ -9,12 +9,17 @@ import { CommonService } from '../../../../services/common.service';
 })
 export class HeaderComponent {
   selectedOption = 'health-it';
+  marginLeft = 300
   
-  constructor(private common:CommonService){}
+  constructor(private common:CommonService){
+    effect(() => {
+      if(common.headerToggleButtonSignal() == 'Comparative'){
+        this.marginLeft = 1100;
+      }
+    })
+  }
 
   onToggleChange(newValue: string): void {
-    this.common.behaviourSubject.next(newValue);
     this.common.changeToggleButton.set(newValue);
-    
   }
 }

@@ -1,1 +1,13 @@
-<div echarts [options]="radarChartOptions" ></div>
+
+<div class="toggle-container" >
+    <mat-button-toggle-group appearance="legacy" [(ngModel)]="selectedOption" (ngModelChange)="onToggleChange($event)"
+      class="toggle-button-group">
+      <mat-button-toggle value="present-development" class="toggle-button">
+        Present Development
+      </mat-button-toggle>
+      <mat-button-toggle value="prospective-development" class="toggle-button">
+        Prospective Development
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div echarts [options]="radarChartOptions" ></div>

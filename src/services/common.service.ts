@@ -6,12 +6,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CommonService {
-  public behaviourSubject = new BehaviorSubject<string>('health-it');
-  changeToggleButton = signal('health-it')
+  presentValueSignal =  signal<{ key: string; taxonomyKey: string ;countryName:{firstCountry : string , secondCountry : string}; countryData: { firstCountry: number; secondCountry: number } }[]>([]);
+  prospectiveValueSignal =  signal<{ key: string; taxonomyKey: string ;countryName:{firstCountry : string , secondCountry : string} ; countryData: { firstCountry: number; secondCountry: number } }[]>([]);
+  changeToggleButton = signal('health-it');
   private hasSelectedIdBeenSetSubject = new BehaviorSubject<boolean>(false);
   hasSelectedIdBeenSet$ = this.hasSelectedIdBeenSetSubject.asObservable();
 
-
+  headerToggleButtonSignal= signal('mainPage');
 
   constructor(private http: HttpClient) { }
 
